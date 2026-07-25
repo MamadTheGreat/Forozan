@@ -1,0 +1,342 @@
+/* ==========================================================================
+   جزوه جامع حقوق ثبت و مقررات دفاتر اسناد رسمی
+   Style Sheet اصلی سایت
+   ========================================================================== */
+
+/* ---------------- فونت B Nazanin ---------------- */
+@font-face {
+  font-family: "B Nazanin";
+  src: url("fonts/BNazanin.woff2") format("woff2"),
+       url("fonts/BNazanin.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "B Nazanin";
+  src: url("fonts/BNazanin-Bold.woff2") format("woff2"),
+       url("fonts/BNazanin-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "B Nazanin", "Vazirmatn", "Tahoma", "IRANSans", sans-serif;
+  background-color: #f4f6f8;
+  color: #2c3e50;
+  line-height: 1.9;
+  direction: rtl;
+  text-align: right;
+  font-size: 19px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 30px auto;
+  background: #ffffff;
+  padding: 35px 45px;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------------- لینک بازگشت ---------------- */
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #2980b9;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.back-link::before {
+  content: "↩ ";
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+/* ---------------- عناوین ---------------- */
+h1 {
+  font-size: 30px;
+  color: #1a252f;
+  border-bottom: 3px solid #3498db;
+  padding-bottom: 12px;
+  margin-bottom: 25px;
+}
+
+h1::before {
+  content: "📘 ";
+}
+
+h2 {
+  font-size: 24px;
+  color: #1a252f;
+  background: #ecf0f1;
+  padding: 12px 18px;
+  border-right: 5px solid #2980b9;
+  border-radius: 6px;
+  margin: 30px 0 20px 0;
+}
+
+h2::before {
+  content: "🗂 ";
+}
+
+h3 {
+  font-size: 20px;
+  color: #2c3e50;
+  margin: 25px 0 12px 0;
+  border-bottom: 1px solid #dcdfe3;
+  padding-bottom: 6px;
+}
+
+h3::before {
+  content: "▫ ";
+  color: #2980b9;
+}
+
+h4 {
+  font-size: 18px;
+  color: #34495e;
+  margin: 18px 0 10px 0;
+}
+
+h4::before {
+  content: "• ";
+  color: #7f8c8d;
+}
+
+/* ---------------- پاراگراف و متن ---------------- */
+p {
+  margin-bottom: 14px;
+  text-align: justify;
+}
+
+strong {
+  color: #1a252f;
+}
+
+u {
+  text-decoration-color: #e74c3c;
+}
+
+hr {
+  border: none;
+  border-top: 2px dashed #d0d3d6;
+  margin: 30px 0;
+}
+
+/* ---------------- لیست‌ها ---------------- */
+ul, ol {
+  margin: 10px 25px 18px 0;
+}
+
+ul li, ol li {
+  margin-bottom: 8px;
+}
+
+/* ---------------- جعبه مواد قانونی ---------------- */
+.law-box {
+  background: #eaf4ff;
+  border-right: 4px solid #3498db;
+  padding: 14px 20px;
+  margin: 18px 0;
+  border-radius: 6px;
+  font-size: 17px;
+}
+
+.law-box::before {
+  content: "📜 ماده قانونی";
+  display: block;
+  font-weight: bold;
+  color: #2980b9;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+/* ---------------- جعبه نکات طلایی آزمونی ---------------- */
+.tip-box {
+  background: #fff8e1;
+  border-right: 4px solid #f39c12;
+  padding: 14px 20px;
+  margin: 18px 0;
+  border-radius: 6px;
+  font-size: 17px;
+}
+
+.tip-box::before {
+  content: "🔑 نکته طلایی آزمونی";
+  display: block;
+  font-weight: bold;
+  color: #e67e22;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+/* ---------------- جعبه هشدار / اشتباه رایج ---------------- */
+.warning-box {
+  background: #fdecea;
+  border-right: 4px solid #e74c3c;
+  padding: 14px 20px;
+  margin: 18px 0;
+  border-radius: 6px;
+  font-size: 17px;
+}
+
+.warning-box::before {
+  content: "⚠️ اشتباه رایج / هشدار";
+  display: block;
+  font-weight: bold;
+  color: #c0392b;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+/* ---------------- جعبه مثال ---------------- */
+.example-box {
+  background: #eafaf1;
+  border-right: 4px solid #27ae60;
+  padding: 14px 20px;
+  margin: 18px 0;
+  border-radius: 6px;
+  font-size: 17px;
+}
+
+.example-box::before {
+  content: "✅ مثال کاربردی";
+  display: block;
+  font-weight: bold;
+  color: #219150;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+/* ---------------- جعبه تعریف / مفهوم (اختیاری برای مفاهیم پایه) ---------------- */
+.definition-box {
+  background: #f3eefc;
+  border-right: 4px solid #8e44ad;
+  padding: 14px 20px;
+  margin: 18px 0;
+  border-radius: 6px;
+  font-size: 17px;
+}
+
+.definition-box::before {
+  content: "📖 تعریف";
+  display: block;
+  font-weight: bold;
+  color: #8e44ad;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+/* ---------------- جعبه فرآیند / مراحل ---------------- */
+.process-box {
+  background: #e8f6f8;
+  border-right: 4px solid #16a085;
+  padding: 14px 20px;
+  margin: 18px 0;
+  border-radius: 6px;
+  font-size: 17px;
+}
+
+.process-box::before {
+  content: "🔄 مراحل اجرا";
+  display: block;
+  font-weight: bold;
+  color: #148f77;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+/* ---------------- جدول ---------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 16.5px;
+}
+
+table th {
+  background: #2c3e50;
+  color: #fff;
+  padding: 10px 14px;
+  text-align: right;
+}
+
+table th::before {
+  content: "📊 ";
+}
+
+table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+table tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+table tr:hover {
+  background: #eef6fc;
+}
+
+/* ---------------- صفحه فهرست (index.html) ---------------- */
+.session-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.session-list li {
+  margin-bottom: 12px;
+}
+
+.session-list a {
+  display: block;
+  background: #f8f9fa;
+  padding: 14px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #2c3e50;
+  font-weight: bold;
+  border-right: 4px solid #3498db;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.session-list a::before {
+  content: "🎓 ";
+}
+
+.session-list a:hover {
+  background: #eaf4ff;
+  transform: translateX(-4px);
+}
+
+/* ---------------- پانویس جزئی ---------------- */
+.note-footer {
+  color: #7f8c8d;
+  font-size: 15px;
+  margin-top: 25px;
+}
+
+/* ---------------- ریسپانسیو ---------------- */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px 18px;
+    margin: 12px;
+  }
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+  body { font-size: 17px; }
+}
