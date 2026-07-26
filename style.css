@@ -291,7 +291,7 @@ table tr:hover {
   background: #eef6fc;
 }
 
-/* ---------------- صفحه فهرست (index.html) ---------------- */
+/* ---------------- صفحه فهرست (index.html) — نمای قدیمی لیست ساده ---------------- */
 .session-list {
   list-style: none;
   margin: 0;
@@ -302,7 +302,7 @@ table tr:hover {
   margin-bottom: 12px;
 }
 
-.session-list a {
+.session-list li a {
   display: block;
   background: #f8f9fa;
   padding: 14px 20px;
@@ -314,13 +314,99 @@ table tr:hover {
   transition: background 0.2s, transform 0.15s;
 }
 
-.session-list a::before {
+.session-list li a::before {
   content: "🎓 ";
 }
 
-.session-list a:hover {
+.session-list li a:hover {
   background: #eaf4ff;
   transform: translateX(-4px);
+}
+
+/* ==========================================================================
+   آکاردئون فهرست جلسات (نسخه جدید index.html)
+   هر جلسه با کلیک باز می‌شود و دو گزینه «نکات جلسه» و «آزمون» را نشان می‌دهد
+   ========================================================================== */
+.session-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.session-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  text-align: right;
+}
+
+.session-toggle:hover {
+  background: #f5f9fc;
+}
+
+.session-toggle .session-num {
+  background: #2980b9;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.session-toggle .session-title {
+  flex: 1;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.toggle-icon {
+  transition: transform 0.25s;
+  color: #7f8c8d;
+}
+
+.session-item.open .toggle-icon {
+  transform: rotate(180deg);
+}
+
+.session-submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+  background: #f8f9fa;
+  display: flex;
+}
+
+.session-item.open .session-submenu {
+  max-height: 100px;
+}
+
+.session-submenu a {
+  flex: 1;
+  text-align: center;
+  padding: 14px;
+  text-decoration: none;
+  color: #2c3e50;
+  border-top: 1px solid #e0e0e0;
+  font-size: 15px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.session-submenu a:first-child {
+  border-left: 1px solid #e0e0e0;
+}
+
+.session-submenu a:hover {
+  background: #eaf2f8;
+  color: #2980b9;
 }
 
 /* ---------------- پانویس جزئی ---------------- */
@@ -339,4 +425,5 @@ table tr:hover {
   h1 { font-size: 24px; }
   h2 { font-size: 20px; }
   body { font-size: 17px; }
+  .session-toggle .session-title { font-size: 15px; }
 }
