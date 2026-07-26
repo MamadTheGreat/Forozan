@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آزمون جلسه دوم - مقررات ثبتی</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .quiz-container { max-width: 800px; margin: 20px auto; padding: 20px; }
+  .question-card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .question-text { font-size: 1.1rem; font-weight: bold; margin-bottom: 16px; line-height: 1.8; }
+  .options label { display: block; padding: 10px 14px; margin: 6px 0; border-radius: 8px; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.2s; }
+  .options label:hover { border-color: #1a73e8; background: #f0f7ff; }
+  .options input[type="radio"] { margin-left: 8px; }
+  .correct { background: #e6f4ea !important; border-color: #34a853 !important; }
+  .wrong { background: #fce8e6 !important; border-color: #ea4335 !important; }
+  .explanation { margin-top: 12px; padding: 12px; background: #fff8e1; border-right: 4px solid #f9ab00; border-radius: 6px; font-size: 0.95rem; line-height: 1.7; display: none; }
+  .nav-buttons { display: flex; justify-content: space-between; margin-top: 16px; }
+  .btn { padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-family: inherit; }
+  .btn-primary { background: #1a73e8; color: white; }
+  .btn-secondary { background: #f1f3f4; color: #333; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .progress-bar { background: #e0e0e0; border-radius: 10px; height: 8px; margin-bottom: 20px; }
+  .progress-fill { background: #1a73e8; height: 8px; border-radius: 10px; transition: width 0.3s; }
+  .question-counter { text-align: center; color: #666; margin-bottom: 8px; }
+  .result-card { background: #fff; border-radius: 12px; padding: 32px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .result-score { font-size: 3rem; font-weight: bold; color: #1a73e8; }
+  .result-stats { display: flex; justify-content: center; gap: 24px; margin: 20px 0; flex-wrap: wrap; }
+  .stat-item { padding: 12px 20px; border-radius: 8px; min-width: 100px; }
+  .stat-correct { background: #e6f4ea; color: #137333; }
+  .stat-wrong { background: #fce8e6; color: #c5221f; }
+  .stat-skip { background: #f1f3f4; color: #555; }
+  .back-link { display: inline-block; margin-bottom: 16px; color: #1a73e8; text-decoration: none; font-size: 0.95rem; }
+  .back-link:hover { text-decoration: underline; }
+  h1 { text-align: center; color: #1a73e8; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <a href="index.html" class="back-link">← بازگشت به فهرست</a>
+  <h1>آزمون جلسه دوم</h1>
+  <div id="quiz-area">
+    <div class="question-counter" id="counter">سوال ۱ از ۳۰</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:3.33%"></div></div>
+    <div id="question-container"></div>
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" id="prev-btn" onclick="navigate(-1)" disabled>قبلی</button>
+      <button class="btn btn-primary" id="next-btn" onclick="navigate(1)">بعدی</button>
+    </div>
+  </div>
+  <div id="result-area" style="display:none"></div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "۱. اصطلاح «ملک مجهول‌المالک» در حقوق ثبت به چه معناست و چه تفاوتی با مفهوم آن در حقوق مدنی دارد؟",
+    opts: [
+      "ملکی است که مالک آن مشخص نیست؛ در حالی که در حقوق مدنی ملکی است که اساساً مالک ندارد.",
+      "ملکی است که اظهارنامه آن در موعد مقرر ثبتی برگشت نشده است؛ در حالی که در حقوق مدنی ملکی است که مالک دارد اما هویت او شناخته شده نیست.",
+      "ملکی است که سابقه تقاضای ثبت ندارد؛ در حالی که در حقوق مدنی ملکی است که اعراض مالک از آن محرز است.",
+      "ملکی است که مالک آن فوت کرده و وراث مشخص نیستند؛ در حالی که در حقوق مدنی به مال مباح اطلاق می‌شود."
+    ],
+    answer: 1,
+    exp: "یکی از تله‌های طراحان، خلط تعاریف مدنی و ثبتی است. مجهول‌المالک ثبتی یعنی ملکی که ثبت مقدماتی شده اما تقاضای ثبت (ارائه اظهارنامه) در مهلت قانونی برای آن به عمل نیامده است، ولو اینکه مالک آن در عالم واقع مشخص و در ملک متصرف باشد."
+  },
+  {
+    q: "۲. کدام‌یک از گزینه‌های زیر بیانگر تعریف «سند رسمی از منظر حقوق ثبت» است؟",
+    opts: [
+      "هر سندی که در اداره ثبت اسناد و املاک یا دفاتر اسناد رسمی تنظیم شده باشد.",
+      "هر نوشته‌ای که نزد مأمورین رسمی در حدود صلاحیت آن‌ها تنظیم شود.",
+      "نوشته‌ای که صرفاً نزد دفاتر اسناد رسمی تنظیم و ثبت می‌شود.",
+      "اسنادی که اعتبار آن‌ها توسط دادگاه تنفیذ شده باشد."
+    ],
+    answer: 2,
+    exp: "گرچه ماده ۱۲۸۷ ق.م سه شق برای سند رسمی قائل است، اما «منظر حقوق ثبت» با تکیه بر ویژگی لازم‌الاجرا بودن، منحصراً بر اسناد تنظیمی در دفاتر اسناد رسمی (و دفاتر ازدواج و طلاق) تمرکز دارد."
+  },
+  {
+    q: "۳. چرا در حقوق ثبت، اسنادِ موضوع شق اول و دوم ماده ۱۲۸۷ قانون مدنی به عنوان سند رسمیِ کاملِ ثبتی نگریسته نمی‌شوند؟",
+    opts: [
+      "به دلیل عدم اعتبار قانونی آن‌ها در محاکم.",
+      "به دلیل عدم امضای آن‌ها توسط سردفتر اسناد رسمی.",
+      "به دلیل عدم برخورداری این اسناد از وصف ذاتی «لازم‌الاجرا بودن».",
+      "به دلیل اینکه این اسناد صرفاً جنبه اعلامی دارند و حقوقی را ایجاد نمی‌کنند."
+    ],
+    answer: 2,
+    exp: "امتیاز طلایی و معیار تفکیک اسناد در حقوق ثبت، داشتن یا نداشتن قدرت اجراییِ مستقیم (بدون نیاز به دادگاه) است."
+  },
+  {
+    q: "۴. در صورتی که در یک تست آزمون سردفتری بدون ذکر منبع، تعریف سند رسمی خواسته شود، ملاک اصلی پاسخگویی کدام است؟",
+    opts: [
+      "ملاک، ماده ۱۲۸۷ قانون مدنی است مگر اینکه قرینه‌ای بر نگاه ثبتی وجود داشته باشد.",
+      "ملاک، تعریف استنباطی قانون ثبت است.",
+      "سوال به دلیل ابهام قابلیت حذف دارد.",
+      "هر دو تعریف به صورت توأمان باید انتخاب شود."
+    ],
+    answer: 0,
+    exp: "در سوالات آزمونی عمومی، اصل بر قانون عام (قانون مدنی) است، مگر اینکه سوال مستقیماً به «مقررات ثبتی» یا «دفاتر اسناد رسمی» اشاره کند."
+  },
+  {
+    q: "۵. کدام‌یک از اسناد زیر، از منظر حقوق ثبت، دارای بالاترین درجه از حیث آثار اجرایی و عدم نیاز به رسیدگی قضایی است؟",
+    opts: [
+      "سند مالکیت کاداستری صادر شده از اداره ثبت",
+      "صورت‌جلسه افراز تنظیمی توسط نماینده ثبت",
+      "سند رسمی انتقال قطعی تنظیمی در دفتر اسناد رسمی",
+      "شناسنامه صادره از اداره ثبت احوال"
+    ],
+    answer: 2,
+    exp: "گزینه‌های ۱، ۲ و ۴ همگی سند رسمی (ماده ۱۲۸۷) هستند، اما فقط گزینه ۳ سند تنظیمی در دفترخانه و واجد وصف لازم‌الاجرا بودن است."
+  },
+  {
+    q: "۶. تفاوت اصلی در ماهیت «سند مالکیت» و «سند رسمی انتقال ملک» چیست؟",
+    opts: [
+      "سند مالکیت سند رسمی است ولی سند انتقال، سند عادی در حکم رسمی است.",
+      "سند مالکیت جنبه اعلامی و اثباتی دارد، در حالی که سند انتقال واجد جنبه انشایی و تعهدی (لازم‌الاجرا) است.",
+      "سند مالکیت در دفترخانه تنظیم می‌شود ولی سند انتقال در اداره ثبت.",
+      "هیچ تفاوت ماهوی ندارند و هر دو لازم‌الاجرا هستند."
+    ],
+    answer: 1,
+    exp: "اسنادِ مالکیت صادر شده از اداره ثبت، صرفاً کاشف از مالکیت هستند و تعهدی در آن‌ها درج نشده که قابل اجرا از طریق صدور اجراییه باشد."
+  },
+  {
+    q: "۷. مأمور رسمی مذکور در شق اول ماده ۱۲۸۷ قانون مدنی با سردفتر اسناد رسمی در کدام مورد تشابه دارند؟",
+    opts: [
+      "هر دو مجاز به صدور دستور اجرای مفاد سند هستند.",
+      "هر دو برای تنظیم سند نیاز به احراز صلاحیت ذاتی و محلی دارند.",
+      "اسناد تنظیمی هر دو بدون استثنا لازم‌الاجراست.",
+      "هر دو مستخدم رسمی و حقوق‌بگیر دولت محسوب می‌شوند."
+    ],
+    answer: 1,
+    exp: "رعایت صلاحیت (ذاتی و محلی) شرط صحت و رسمی بودن کار هر دو مأمور است، اما سردفتر برخلاف مأمور دولتی، مستخدم حقوق‌بگیر دولت نیست و اسنادش قدرت اجرایی مستقیم دارند."
+  },
+  {
+    q: "۸. چنانچه ملکی مجهول‌المالک ثبتی باشد، وضعیت مالکیت فعلی آن در حقوق مدنی چگونه تحلیل می‌شود؟",
+    opts: [
+      "ملک متعلق به دولت (انفال) است.",
+      "ملک بدون مالک تلقی شده و حیازت آن آزاد است.",
+      "ملک دارای مالکِ مشخص یا ناشناس است و مالکیت وی محترم است.",
+      "تصرف در آن بدون اذن اداره 
