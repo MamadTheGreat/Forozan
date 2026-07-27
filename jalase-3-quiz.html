@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آزمون جلسه ۳ - مقررات ثبتی</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .quiz-container { max-width: 800px; margin: 20px auto; padding: 20px; }
+  .question-card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .question-text { font-size: 1.1rem; font-weight: bold; margin-bottom: 16px; line-height: 1.8; }
+  .options label { display: block; padding: 10px 14px; margin: 6px 0; border-radius: 8px; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.2s; }
+  .options label:hover { border-color: #1a73e8; background: #f0f7ff; }
+  .options input[type="radio"] { margin-left: 8px; }
+  .correct { background: #e6f4ea !important; border-color: #34a853 !important; }
+  .wrong { background: #fce8e6 !important; border-color: #ea4335 !important; }
+  .explanation { margin-top: 12px; padding: 12px; background: #fff8e1; border-right: 4px solid #f9ab00; border-radius: 6px; font-size: 0.95rem; line-height: 1.7; }
+  .nav-buttons { display: flex; justify-content: space-between; margin-top: 16px; }
+  .btn { padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-family: inherit; }
+  .btn-primary { background: #1a73e8; color: white; }
+  .btn-secondary { background: #f1f3f4; color: #333; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .progress-bar { background: #e0e0e0; border-radius: 10px; height: 8px; margin-bottom: 20px; }
+  .progress-fill { background: #1a73e8; height: 8px; border-radius: 10px; transition: width 0.3s; }
+  .question-counter { text-align: center; color: #666; margin-bottom: 8px; }
+  .result-card { background: #fff; border-radius: 12px; padding: 32px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .result-score { font-size: 3rem; font-weight: bold; color: #1a73e8; }
+  .result-stats { display: flex; justify-content: center; gap: 24px; margin: 20px 0; flex-wrap: wrap; }
+  .stat-item { padding: 12px 20px; border-radius: 8px; min-width: 100px; }
+  .stat-correct { background: #e6f4ea; color: #137333; }
+  .stat-wrong { background: #fce8e6; color: #c5221f; }
+  .stat-skip { background: #f1f3f4; color: #555; }
+  .back-link { display: inline-block; margin-bottom: 16px; color: #1a73e8; text-decoration: none; font-size: 0.95rem; }
+  .back-link:hover { text-decoration: underline; }
+  h1 { text-align: center; color: #1a73e8; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <a href="index.html" class="back-link">← بازگشت به فهرست</a>
+  <h1>آزمون جلسه سوم</h1>
+  <div id="quiz-area">
+    <div class="question-counter" id="counter"></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div id="question-container"></div>
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" id="prev-btn" onclick="navigate(-1)" disabled>قبلی</button>
+      <button class="btn btn-primary" id="next-btn" onclick="navigate(1)">بعدی</button>
+    </div>
+  </div>
+  <div id="result-area" style="display:none"></div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "مطابق ماده ۱۲۹۱ قانون مدنی، یکی از مهم‌ترین موارد اعتبار سند عادی کدام است؟",
+    opts: ["زمانی که موضوع آن فقط اموال منقول باشد", "زمانی که در اداره ثبت تنظیم شده باشد", "زمانی که به امضای دو شاهد رسیده باشد", "زمانی که میان طرفین نسبت به مفاد آن اختلافی نباشد"],
+    answer: 3,
+    exp: "در این جلسه، تکیه اصلی بر این است که سند عادی وقتی میان طرفین مورد قبول باشد، بین خود آن‌ها معتبر است."
+  },
+  {
+    q: "اگر الف و ب با سند عادی، ملکی را معامله کنند و هیچ اختلافی هم نسبت به آن نداشته باشند، این سند اصولاً در چه محدوده‌ای معتبر است؟",
+    opts: ["فقط بین طرفین", "فقط نسبت به اشخاص ثالث", "فقط در برابر بانک‌ها", "فقط در برابر مراجع قضایی"],
+    answer: 0,
+    exp: "تله رایج این است که اعتبار سند عادی را به اشخاص ثالث هم تسری بدهند؛ درحالی‌که اصل، اعتبار آن بین طرفین است."
+  },
+  {
+    q: "اگر خریدار ملکی که با قولنامه عادی خریده، همان قولنامه را به بانک ارائه کند و تقاضای وام نماید، بانک از چه حیث می‌تواند آن را نپذیرد؟",
+    opts: ["چون بانک قائم‌مقام قانونی فروشنده است", "چون بانک شخص ثالث است و الزامی به پذیرش سند عادی ندارد", "چون سند عادی اصولاً باطل است", "چون سند عادی فقط در دعاوی خانوادگی معتبر است"],
+    answer: 1,
+    exp: "مثال بانک از مثال‌های کلاسیک برای نشان دادن عدم اعتبار سند عادی در برابر ثالث است."
+  },
+  {
+    q: "در مقایسه با سند عادی، سند رسمی در کدام فرض علاوه بر طرفین، در برابر اشخاص ثالث نیز اعتبار برجسته دارد؟",
+    opts: ["در همه اسناد رسمی بدون استثنا", "فقط در اسناد مربوط به خودرو", "به‌ویژه در معاملات راجع به املاک", "فقط در اسناد تعهدآور غیرمالی"],
+    answer: 2,
+    exp: "این قاعده به‌طور خاص در معاملات املاک اهمیت برجسته دارد."
+  },
+  {
+    q: "اگر ملکی با سند مالکیت رسمی منتقل شده باشد، کدام‌یک از اشخاص زیر به‌عنوان ثالث معمولاً سند رسمی را می‌پذیرد؟",
+    opts: ["بانک و دادگاه", "فقط فروشنده", "فقط خریدار", "فقط شهود معامله"],
+    answer: 0,
+    exp: "دو مثال مهم متن، بانک برای تسهیلات و دادگاه برای وثیقه است."
+  },
+  {
+    q: "در خصوص اعتبار سند رسمی در حوزه املاک، کدام عبارت صحیح است؟",
+    opts: ["فقط در صورت تایید بانک نسبت به ثالث معتبر می‌شود", "فقط بین طرفین معتبر است و نسبت به ثالث اثری ندارد", "بین طرفین و قائم‌مقام قانونی معتبر است، اما برای ثالث اعتبار ندارد", "بین طرفین، قائم‌مقام قانونی و اشخاص ثالث معتبر است"],
+    answer: 3,
+    exp: "این گزاره از مهم‌ترین تمایزهای سند رسمی و عادی در این جلسه است."
+  },
+  {
+    q: "کدام گزینه در مقایسه سند عادی و سند رسمی صحیح‌تر است؟",
+    opts: ["هر دو نسبت به اشخاص ثالث به یک میزان معتبرند", "سند عادی اصولاً بین طرفین معتبر است، ولی سند رسمی در برخی موارد نسبت به ثالث نیز اعتبار دارد", "سند عادی و رسمی فقط میان طرفین معتبرند", "سند رسمی فقط نسبت به قائم‌مقام قانونی معتبر است"],
+    answer: 1,
+    exp: "اگر در تست، واژه «اصولاً» درباره سند عادی و واژه «در برخی موارد» درباره سند رسمی بیاید، معمولاً طراح دقیق عمل کرده است."
+  },
+  {
+    q: "اگر شخصی با سند مالکیت رسمی برای آزادی زندانی، وثیقه معرفی کند، پذیرش آن از سوی دادگاه بر کدام مبنا قابل توجیه است؟",
+    opts: ["دادگاه قائم‌مقام مالک است", "چون سند رسمی نیازی به امضا ندارد", "سند رسمی ملکی نسبت به شخص ثالث نیز اعتبار دارد", "دادگاه همیشه هر نوع سندی را می‌پذیرد"],
+    answer: 2,
+    exp: "دادگاه در این مثال، شخص ثالث است، نه طرف معامله."
+  },
+  {
+    q: "کدام گزینه درباره سند عادی نادرست است؟",
+    opts: ["شخص ثالث الزاماً باید آن را مانند سند رسمی بپذیرد", "ممکن است بین طرفین معتبر باشد", "در فرض قبول طرفین، مفاد آن بین خودشان قابل استناد است", "ماده ۱۲۹۱ قانون مدنی از مستندات اعتبار آن است"],
+    answer: 0,
+    exp: "مهم‌ترین دام این مبحث، یکسان دانستن اثر سند عادی و رسمی در برابر ثالث است."
+  },
+  {
+    q: "مطابق تحلیل این جلسه، قولنامه عادی خرید ملک نزد بانک معمولاً چرا کفایت نمی‌کند؟",
+    opts: ["چون قولنامه همیشه فاقد اثر حقوقی است", "چون بانک فقط اسناد دولتی را می‌پذیرد", "چون قولنامه باید ابتدا در دادگاه تنفیذ شود", "چون سند عادی صرفاً نوشته‌ای میان طرفین است و بانک شخص ثالث محسوب می‌شود"],
+    answer: 3,
+    exp: "عبارت «صرفاً نوشته‌ای است که میان خودتان تنظیم کرده‌اید» عین همان منطق متن درس است."
+  },
+  {
+    q: "مطابق ماده ۷۳ قانون ثبت، اگر مأموران یا قضات دادگستری مدلول و مفاد اسناد رسمی را نادیده بگیرند، چه ضمانت اجرایی پیش‌بینی شده است؟",
+    opts: ["فقط مسئولیت مدنی دارند", "در دادگاه انتظامی تحت تعقیب قرار می‌گیرند", "صرفاً به جبران خسارت محکوم می‌شوند", "سند رسمی خودبه‌خود باطل می‌شود"],
+    answer: 1,
+    exp: "ماده ۷۳ نشانه اهمیت بالای سند رسمی است؛ طراحان گاهی بین مسئولیت انتظامی و بطلان سند خلط ایجاد می‌کنند."
+  },
+  {
+    q: "از دیدگاه این جلسه، تشبیه سند رسمی به «حکم دادگاه» ناظر به کدام ویژگی آن است؟",
+    opts: ["امکان ابطال توسط اداره ثبت", "نیاز به رسیدگی بدوی", "قدرت اجرایی بالا", "قابلیت تجدیدنظرخواهی"],
+    answer: 2,
+    exp: "سند رسمی از حیث قدرت اجرایی همانند حکم دادگاه است."
+  },
+  {
+    q: "مطابق ماده ۱۲۸۷ قانون مدنی، برای رسمی بودن سند، کدام شرط علاوه بر «نزد مأمور رسمی بودن» ضروری است؟",
+    opts: ["تنظیم در حدود صلاحیت مأمور و مطابق مقررات قانونی", "وجود دو شاهد", "تنظیم به زبان فارسی", "تایید دادستان محل"],
+    answer: 0,
+    exp: "تله مهم این مبحث، اکتفا به «مأمور رسمی بودن» است؛ درحالی‌که قید «در حدود صلاحیت» بسیار کلیدی است."
+  },
+  {
+    q: "نقد اصلی وارد بر استدلال نیروی انتظامی در بحث اسناد خودرو، از دید استاد، چه بود؟",
+    opts: ["سند خودرو فقط با حکم دادگاه معتبر می‌شود", "برگ سبز اصولاً جعلی است", "نیروی انتظامی مأمور رسمی نیست", "مأمور رسمی بودن به‌تنهایی کافی نیست و باید صلاحیت قانونی وجود داشته باشد"],
+    answer: 3,
+    exp: "محور پاسخ استاد این است که صلاحیت در تنظیم روابط حقوقی انتقالی باید وجود داشته باشد."
+  },
+  {
+    q: "ماده ۲۹ قانون رسیدگی به تخلفات رانندگی مصوب ۱۳۸۹ از منظر این جلسه چه کارکردی دارد؟",
+    opts: ["صلاحیت دادگاه را در دعاوی خودرو حذف می‌کند", "میان امور فنی و تعویض پلاک از یک سو و انتقال حقوقی از سوی دیگر تفکیک می‌کند", "انتقال خودرو را کاملاً از صلاحیت دفاتر اسناد رسمی خارج کرده است", "برگ سبز را جانشین همه عقود و ایقاعات می‌داند"],
+    answer: 1,
+    exp: "کلیدی‌ترین نکته ماده ۲۹ در این درس، تفکیک امور فنی از انتقال حقوقی است."
+  },
+  {
+    q: "اگر پدری بخواهد خودرو را به نام پسرش منتقل کند، اما حق فسخ یا استیفای منافع را برای خود نگه دارد، از دید استاد محل مناسب تنظیم این روابط کجاست؟",
+    opts: ["کلانتری محل", "شورای حل اختلاف", "دفتر اسناد رسمی", "صرفاً مرکز تعویض پلاک"],
+    answer: 2,
+    exp: "تنظیم شروط پیچیده حقوقی از قبیل حق فسخ و استیفای منافع از کارویژه‌های دفترخانه است."
+  },
+  {
+    q: "از منظر این جلسه، وظیفه اصلی مراکز تعویض پلاک چیست؟",
+    opts: ["انجام امور فنی و اداری مربوط به پلاک", "تنظیم شروط قراردادی انتقال", "تنسیق روابط حقوقی پیچیده مردم", "صدور سند انتقال قطعی با تمام شروط خصوصی"],
+    answer: 0,
+    exp: "طراح ممکن است بین شناسنامه فنی خودرو و سند انتقال حقوقی خلط ایجاد کند."
+  },
+  {
+    q: "کدام گزینه با تحلیل استاد درباره برگ سبز خودرو سازگارتر است؟",
+    opts: ["برگ سبز جایگزین قطعی همه اسناد دفترخانه‌ای است", "برگ سبز فقط در صورت تأیید کانون سردفتران معتبر است", "برگ سبز، ابزار تنظیم همه شروط قراردادی طرفین است", "برگ سبز به‌عنوان شناسنامه فنی خودرو شناخته می‌شود، نه ابزار دخالت در همه امور قراردادی"],
+    answer: 3,
+    exp: "در این درس، برگ سبز بیشتر در جایگاه سند یا شناسنامه فنی تحلیل می‌شود، نه تنظیم‌کننده همه روابط قراردادی."
+  },
+  {
+    q: "کدام گزینه درباره حدود صلاحیت پلیس در بحث انتقال خودرو، مطابق متن درس صحیح‌تر است؟",
+    opts: ["پلیس فقط وقتی صلاحیت دارد که طرفین اختلاف نداشته باشند", "صرف مأمور رسمی بودن، صلاحیت دخالت در معاملات مردم را اثبات نمی‌کند", "پلیس و سردفتر از حیث صلاحیت تنظیم روابط قراردادی یکسان‌اند", "پلیس در تمام عقود و ایقاعات مردم صلاحیت عام دارد"],
+    answer: 1,
+    exp: "عبارت «صرف مأمور رسمی بودن کافی نیست» از کلیدی‌ترین گزاره‌های تستی این قسمت است."
+  },
+  {
+    q: "نتیجه تحلیلی استاد از بی‌اعتنایی به جایگاه دفاتر اسناد رسمی در تنظیم اسناد خودرو چه بود؟",
+    opts: ["همه اختلافات خودرو از بین رفت", "صلاحیت دفاتر در همه زمینه‌ها توسعه یافت", "فعالیت دفاتر در بخش مهمی از اسناد خودرو کاهش یافت و برخی دچار آسیب اقتصادی شدند", "دفاتر از نظر اقتصادی منتفع شدند"],
+    answer: 2,
+    exp: "این سوال بیشتر متن‌محور است و ممکن است در تست‌های آموزشی یا جمع‌بندی بیاید."
+  },
+  {
+    q: "دفترخانه اسناد رسمی در تعریف این جلسه، کدام‌یک از اوصاف زیر را دارد؟",
+    opts: ["واحدی وابسته به قوه قضاییه برای تنظیم و ثبت اسناد رسمی", "واحدی مستقل از حاکمیت برای تنظیم اسناد عادی", "واحدی وابسته به وزارت کشور برای صدور مجوزهای عمومی", "واحدی وابسته به نیروی انتظامی برای ثبت معاملات"],
+    answer: 0,
+    exp: "در قانون قدیم تعبیر وزارت دادگستری آمده، اما در ساختار فعلی باید آن را با قوه قضاییه تطبیق داد."
+  },
+  {
+    q: "در تعریف دفترخانه، کدام دو عنصر نقش محوری دارند؟",
+    opts: ["تنظیم و ابلاغ", "پیشنهاد و انتصاب", "ثبت و اجرا", "تنظیم و ثبت"],
+    answer: 3,
+    exp: "دفترخانه فقط محل نگارش نیست؛ هم تنظیم می‌کند، هم ثبت."
+  },
+  {
+    q: "اداره امور دفترخانه اسناد رسمی بر عهده چه کسی است؟",
+    opts: ["دفتریار اول", "سردفتر", "رئیس سازمان ثبت", "دادستان محل"],
+    answer: 1,
+    exp: "این سوال ساده است اما طراح گاهی با نزدیک کردن نقش دفتریار اول به سردفتر، ایجاد اشتباه می‌کند."
+  },
+  {
+    q: "انتصاب سردفتر اسناد رسمی مستلزم عبور از چند فیلتر اصلی است؟",
+    opts: ["چهار فیلتر", "یک فیلتر", "سه فیلتر", "دو فیلتر"],
+    answer: 2,
+    exp: "سه رکن اصلی را دقیق حفظ کنید: پیشنهاد سازمان ثبت، نظر مشورتی، ابلاغ رئیس قوه قضاییه."
+  },
+  {
+    q: "کدام گزینه ترتیب صحیح مراحل اصلی انتصاب سردفتر را نشان می‌دهد؟",
+    opts: ["پیشنهاد سازمان ثبت، نظر مشورتی کانون یا دادستان محل، ابلاغ رئیس قوه قضاییه", "پیشنهاد سردفتر، اختبار کانون، ابلاغ سازمان ثبت", "پیشنهاد دادستان، ابلاغ کانون، تایید سازمان ثبت", "پیشنهاد کانون، ابلاغ دادگاه، ثبت در اداره مالیات"],
+    answer: 0,
+    exp: "تفاوت مرجع پیشنهاد و مرجع ابلاغ در سردفتر و دفتریار بسیار تست‌خیز است."
+  },
+  {
+    q: "در صورتی که در مرکز استان، کانون سردفتران و دفتریاران وجود نداشته باشد، نظر مشورتی لازم برای انتصاب سردفتر را چه کسی ارائه می‌کند؟",
+    opts: ["رئیس دادگستری استان", "فرماندار", "دفتریار اول", "دادستان محل"],
+    answer: 3,
+    exp: "این استثنا را جداگانه حفظ کنید؛ نبود کانون = دادستان محل."
+  },
+  {
+    q: "اصلاح قانون تسهیل صدور مجوزهای کسب‌وکار نسبت به قانون دفاتر اسناد رسمی، بنابر این جلسه، ناظر به کدام ماده بوده است؟",
+    opts: ["ماده ۲", "ماده ۵", "ماده ۷۳", "ماده ۱۲۸۷"],
+    answer: 1,
+    exp: "قانون تسهیل فقط ماده ۵ را اصلاح کرده، نه ماده ۲ را."
+  },
+  {
+    q: "اثر اصلاح ماده ۵ قانون دفاتر اسناد رسمی به‌موجب قانون تسهیل چیست؟",
+    opts: ["حذف نظر مشورتی کانون", "حذف کامل مصاحبه، اختبار و ابلاغ", "برداشتن قید ظرفیت و برگزاری سالانه آزمون", "واگذاری انتصاب سردفتر به سردفتران شاغل"],
+    answer: 2,
+    exp: "دام مهم این است که تصور شود قانون تسهیل همه مراحل انتصاب را حذف کرده؛ درحالی‌که فقط بحث ظرفیت را تغییر داده است."
+  },
+  {
+    q: "دفتریار اول از حیث جایگاه حقوقی چه سمتی دارد؟",
+    opts: ["هم معاون سردفتر است و هم نماینده سازمان ثبت در دفترخانه", "فقط کارمند دفترخانه است", "فقط نماینده کانون سردفتران است", "صرفاً قائم‌مقام رئیس دادگستری است"],
+    answer: 0,
+    exp: "دوگانه بودن سمت دفتریار اول، از نکات مهم و پرسش‌خیز است."
+  },
+  {
+    q: "کدام گزینه درباره تفاوت دفتریار اول و دفتریار دوم صحیح است؟",
+    opts: ["هر دو به پیشنهاد سازمان ثبت و ابلاغ رئیس قوه قضاییه منصوب می‌شوند", "هر دو الزامی‌اند و هر دو ۱۵ درصد حق‌التحریر می‌گیرند", "دفتریار دوم نماینده سازمان ثبت است ولی دفتریار اول نیست", "دفتریار اول الزامی و دارای ۱۵ درصد حق‌التحریر است؛ دفتریار دوم اختیاری و مشمول قانون کار است"],
+    answer: 3,
+    exp: "سه تفاوت را با هم حفظ کنید: الزامی/اختیاری، ۱۵ درصد حق‌التحریر/حقوق کارگری، و جایگاه نمایندگی سازمان ثبت."
+  }
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+function toFarsiNum(n) {
+  return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const userAns = answers[current];
+  document.getElementById('counter').textContent = `سوال ${toFarsiNum(current+1)} از ${toFarsiNum(questions.length)}`;
+  document.getElementById('progress').style.width = ((current+1)/questions.length*100) + '%';
+
+  let optsHtml = q.opts.map((opt, i) => {
+    let cls = '';
+    if (userAns !== null) {
+      if (i === q.answer) cls = 'correct';
+      else if (i === userAns) cls = 'wrong';
+    }
+    return `<label class="${cls}">
+      <input type="radio" name="opt" value="${i}" ${userAns !== null ? 'disabled' : ''} ${userAns === i ? 'checked' : ''}>
+      ${opt}
+    </label>`;
+  }).join('');
+
+  document.getElementById('question-container').innerHTML = `
+    <div class="question-card">
+      <div class="question-text">${q.q}</div>
+      <div class="options">${optsHtml}</div>
+      <div class="explanation" id="exp" style="display:${userAns !== null ? 'block' : 'none'}">
+        💡 ${q.exp}
+      </div>
+    </div>`;
+
+  if (userAns === null) {
+    document.querySelectorAll('input[name="opt"]').forEach(r => {
+      r.addEventListener('change', () => selectAnswer(parseInt(r.value)));
+    });
+  }
+
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').textContent = current === questions.length - 1 ? 'مشاهده نتیجه' : 'بعدی';
+}
+
+function selectAnswer(idx) {
+  answers[current] = idx;
+  renderQuestion();
+}
+
+function navigate(dir) {
+  if (dir === 1 && current === questions.length - 1) {
+    showResult();
+    return;
+  }
+  current = Math.max(0, Math.min(questions.length - 1, current + dir));
+  renderQuestion();
+}
+
+function showResult() {
+  let correct = 0, wrong = 0, skip = 0;
+  answers.forEach((a, i) => {
+    if (a === null) skip++;
+    else if (a === questions[i].answer) correct++;
+    else wrong++;
+  });
+  const score = Math.max(0, correct - wrong * 0.33).toFixed(2);
+  const pct = ((score / questions.length) * 100).toFixed(1);
+
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('result-area').style.display = 'block';
+  document.getElementById('result-area').innerHTML = `
+    <div class="result-card">
+      <h2>نتیجه آزمون جلسه سوم</h2>
+      <div class="result-score">${toFarsiNum(score)}</div>
+      <div style="color:#666;margin-bottom:16px">از ${toFarsiNum(questions.length)} سوال</div>
+      <div class="result-stats">
+        <div class="stat-item stat-correct">✅ صحیح: ${toFarsiNum(correct)}</div>
+        <div class="stat-item stat-wrong">❌ غلط: ${toFarsiNum(wrong)}</div>
+        <div class="stat-item stat-skip">➖ نزده: ${toFarsiNum(skip)}</div>
+      </div>
+      <div style="font-size:1.2rem;margin:12px 0">درصد: <strong>${toFarsiNum(pct)}٪</strong></div>
+      <div style="margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="restartQuiz()">تلاش مجدد</button>
+        <a href="jalase-3-point.html" class="btn btn-secondary">مطالعه نکات</a>
+        <a href="index.html" class="btn btn-secondary">فهرست جلسات</a>
+      </div>
+    </div>`;
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('result-area').style.display = 'none';
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
+
