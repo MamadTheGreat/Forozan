@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آزمون جلسه ششم - مقررات ثبتی</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.quiz-container{max-width:800px;margin:0 auto;padding:20px}
+.question-card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-bottom:20px}
+.question-text{font-size:1.1rem;font-weight:600;margin-bottom:20px;line-height:1.8;color:#1a1a2e}
+.options{display:flex;flex-direction:column;gap:10px}
+.options label{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:8px;border:2px solid #e0e0e0;cursor:pointer;transition:all .2s;font-size:.95rem}
+.options label:hover{border-color:#4361ee;background:#f0f3ff}
+.options input[type="radio"]{accent-color:#4361ee}
+.correct{border-color:#2dc653!important;background:#f0fff4!important;color:#1a7a3a}
+.wrong{border-color:#e63946!important;background:#fff0f0!important;color:#c1121f}
+.explanation{margin-top:16px;padding:12px 16px;background:#fffbea;border-right:4px solid #f4a261;border-radius:6px;font-size:.9rem;line-height:1.7;color:#555}
+.nav-buttons{display:flex;gap:12px;justify-content:space-between;margin-top:16px}
+.btn{padding:10px 24px;border:none;border-radius:8px;cursor:pointer;font-size:.95rem;font-family:inherit;transition:all .2s}
+.btn-primary{background:#4361ee;color:#fff}
+.btn-primary:hover{background:#3451d1}
+.btn-secondary{background:#e0e0e0;color:#333}
+.btn-secondary:hover{background:#ccc}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.progress-bar{background:#e0e0e0;border-radius:99px;height:8px;margin-bottom:16px}
+.progress-fill{background:#4361ee;height:8px;border-radius:99px;transition:width .3s}
+.question-counter{font-size:.9rem;color:#888;margin-bottom:8px}
+.result-card{background:#fff;border-radius:12px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,.08);text-align:center}
+.result-score{font-size:2.5rem;font-weight:700;color:#4361ee;margin:16px 0}
+.result-stats{display:flex;justify-content:center;gap:24px;margin:20px 0}
+.stat-item{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.9rem}
+.stat-correct{color:#2dc653}
+.stat-wrong{color:#e63946}
+.stat-skip{color:#888}
+.back-link{display:inline-block;margin-bottom:20px;color:#4361ee;text-decoration:none;font-size:.9rem}
+.back-link:hover{text-decoration:underline}
+h1{font-size:1.4rem;color:#1a1a2e;margin-bottom:20px}
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <a href="index.html" class="back-link">→ بازگشت به فهرست جلسات</a>
+  <h1>آزمون جلسه ششم — دفتریار، تضمین و کانون</h1>
+  <div id="quiz-area">
+    <div class="question-counter" id="counter"></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div id="question-container"></div>
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="navigate(-1)" id="btn-prev">قبلی</button>
+      <button class="btn btn-primary" onclick="navigate(1)" id="btn-next">بعدی</button>
+    </div>
+  </div>
+  <div id="result-area" style="display:none"></div>
+</div>
+<script>
+const questions = [
+  {
+    q: "سردفتر حداکثر ظرف چه مدتی پس از آغاز به کار دفترخانه باید دفتریار اول را معرفی کند؟",
+    opts: ["یک ماه","دو ماه","سه ماه","شش ماه"],
+    answer: 1,
+    exp: "سردفتر باید حداکثر ظرف ۲ ماه پس از آغاز به کار دفترخانه، فرد واجد شرایط را به‌عنوان دفتریار اول به سازمان ثبت معرفی کند."
+  },
+  {
+    q: "تأسیس دفترخانه باید حداکثر ظرف چه مدتی از تاریخ ابلاغ الکترونیکی حکم سردفتری انجام شود؟",
+    opts: ["یک ماه","دو ماه","سه ماه","چهار ماه"],
+    answer: 2,
+    exp: "تأسیس دفترخانه باید حداکثر ظرف ۳ ماه از تاریخ ابلاغ الکترونیکی حکم سردفتری انجام شود."
+  },
+  {
+    q: "حداقل سن سردفتر در بدو اشتغال چند سال است؟",
+    opts: ["۱۸ سال","۲۰ سال","۲۴ سال","۲۵ سال"],
+    answer: 2,
+    exp: "حداقل سن سردفتر در بدو اشتغال ۲۴ سال و حداکثر ۵۰ سال است."
+  },
+  {
+    q: "حداکثر سن سردفتر در بدو اشتغال چند سال است؟",
+    opts: ["۴۵ سال","۵۰ سال","۵۵ سال","۶۰ سال"],
+    answer: 1,
+    exp: "حداکثر سن سردفتر در بدو اشتغال ۵۰ سال است."
+  },
+  {
+    q: "حداقل سن دفتریار اول و دوم در بدو اشتغال چند سال است؟",
+    opts: ["۱۸ سال","۲۰ سال","۲۲ سال","۲۴ سال"],
+    answer: 1,
+    exp: "حداقل سن دفتریار اول و دوم در بدو اشتغال ۲۰ سال است."
+  },
+  {
+    q: "آیا کمتر بودن سن دفتریار از سردفتر مانع قانونی دارد؟",
+    opts: ["بله، دفتریار باید هم‌سن یا بزرگ‌تر از سردفتر باشد","بله، دفتریار باید حداقل ۵ سال کوچک‌تر باشد","خیر، مانع قانونی ندارد","فقط در صورت تأیید سازمان ثبت مجاز است"],
+    answer: 2,
+    exp: "کمتر بودن سن دفتریار از سردفتر مانع قانونی ندارد."
+  },
+  {
+    q: "مبنای مسئولیت مدنی سردفتران و دفتریاران کدام است؟",
+    opts: ["ماده ۵۶ قانون ثبت","ماده ۶۸ قانون ثبت و ماده ۲۲ قانون دفاتر اسناد رسمی مصوب ۱۳۵۴","ماده ۱۰ قانون مدنی","ماده ۳۰ قانون دفاتر اسناد رسمی"],
+    answer: 1,
+    exp: "مبنای مسئولیت مدنی، ماده ۶۸ قانون ثبت و ماده ۲۲ قانون دفاتر اسناد رسمی مصوب ۱۳۵۴ است."
+  },
+  {
+    q: "معرفی ضامن هنگام شروع به کار سردفتر یا دفتریار باید با چه نوع سندی انجام شود؟",
+    opts: ["سند عادی","سند رسمی","سند عادی با تأیید دادگاه","سند عادی با تأیید سازمان ثبت"],
+    answer: 1,
+    exp: "معرفی ضامن هنگام شروع به کار باید با سند رسمی انجام شود."
+  },
+  {
+    q: "مسئولیت سردفتر یا دفتریار و ضامن آن‌ها چه نوع مسئولیتی است؟",
+    opts: ["انفرادی","تضامنی","نسبی","اشتراکی"],
+    answer: 1,
+    exp: "مسئولیت سردفتر یا دفتریار و ضامن آن‌ها تضامنی است."
+  },
+  {
+    q: "مبلغ ضمانت سردفتر چقدر است؟",
+    opts: ["۳۰۰٬۰۰۰٬۰۰۰ ریال","۵۰۰٬۰۰۰٬۰۰۰ ریال","۷۰۰٬۰۰۰٬۰۰۰ ریال","۱٬۰۰۰٬۰۰۰٬۰۰۰ ریال"],
+    answer: 3,
+    exp: "مبلغ ضمانت سردفتر یک میلیارد ریال (۱٬۰۰۰٬۰۰۰٬۰۰۰ ریال) است."
+  },
+  {
+    q: "مبلغ ضمانت دفتریار اول چقدر است؟",
+    opts: ["۳۰۰٬۰۰۰٬۰۰۰ ریال","۵۰۰٬۰۰۰٬۰۰۰ ریال","۷۰۰٬۰۰۰٬۰۰۰ ریال","۱٬۰۰۰٬۰۰۰٬۰۰۰ ریال"],
+    answer: 1,
+    exp: "مبلغ ضمانت دفتریار اول ۵۰۰٬۰۰۰٬۰۰۰ ریال است."
+  },
+  {
+    q: "مبلغ ضمانت دفتریار دوم چقدر است؟",
+    opts: ["۱۰۰٬۰۰۰٬۰۰۰ ریال","۲۰۰٬۰۰۰٬۰۰۰ ریال","۳۰۰٬۰۰۰٬۰۰۰ ریال","۵۰۰٬۰۰۰٬۰۰۰ ریال"],
+    answer: 2,
+    exp: "مبلغ ضمانت دفتریار دوم ۳۰۰٬۰۰۰٬۰۰۰ ریال است."
+  },
+  {
+    q: "کدام گزینه جایگزین معرفی ضامن شخصی نیست؟",
+    opts: ["سپردن مبلغ نقدی در صندوق سازمان ثبت","معرفی وثیقه ملکی","ارائه ضمانت‌نامه بانکی","ارائه سفته با امضای دو نفر"],
+    answer: 3,
+    exp: "جایگزین‌های ضامن عبارتند از: سپردن مبلغ نقدی، معرفی وثیقه ملکی، یا ارائه ضمانت‌نامه بانکی. سفته جایگزین قانونی نیست."
+  },
+  {
+    q: "در صورت از بین رفتن یا کاهش ارزش وثیقه، ظرف چه مدتی باید ضمانت تبدیل یا کسری جبران شود؟",
+    opts: ["۱۵ روز","یک ماه","دو ماه","سه ماه"],
+    answer: 1,
+    exp: "اداره ثبت اخطار می‌کند که ظرف یک ماه ضمانت تبدیل یا کسری جبران شود."
+  },
+  {
+    q: "در صورت عدم اقدام برای جبران کسری ضمانت در مهلت مقرر، چه اتفاقی می‌افتد؟",
+    opts: ["جریمه نقدی تعلق می‌گیرد","ابلاغ سردفتر یا دفتریار کان‌لم‌یکن می‌شود","پرونده به دادگاه ارجاع می‌شود","دفترخانه موقتاً تعطیل می‌شود"],
+    answer: 1,
+    exp: "در صورت عدم اقدام در مهلت یک ماهه، ابلاغ سردفتر یا دفتریار کان‌لم‌یکن (باطل) می‌شود."
+  },
+  {
+    q: "در مرخصی سردفتر، دفترخانه توسط چه کسی اداره می‌شود؟",
+    opts: ["دفتریار اول به‌طور خودکار","کفیل تعیین‌شده از سوی ثبت محل","معاون سازمان ثبت","سردفتر مجاور"],
+    answer: 1,
+    exp: "در مرخصی، انفصال، فوت یا بازنشستگی سردفتر، دفترخانه توسط کفیل تعیین‌شده از سوی ثبت محل اداره می‌شود."
+  },
+  {
+    q: "کفیل دفترخانه از میان چه کسانی انتخاب می‌شود؟",
+    opts: ["هر سردفتری در کشور","دفتریاران اول یا سردفتران همان حوزه ثبتی","کارمندان سازمان ثبت","وکلای دادگستری همان حوزه"],
+    answer: 1,
+    exp: "کفیل از میان دفتریاران اول یا سردفتران همان حوزه ثبتی انتخاب می‌شود."
+  },
+  {
+    q: "کانون سردفتران و دفتریاران از نظر نظامات تابع کدام قوه است؟",
+    opts: ["قوه مجریه","قوه مقننه","قوه قضاییه","سازمان ثبت اسناد"],
+    answer: 2,
+    exp: "کانون سردفتران و دفتریاران از نظر نظامات تابع قوه قضاییه است."
+  },
+  {
+    q: "کانون سردفتران و دفتریاران دارای چه ویژگی‌هایی است؟",
+    opts: ["فاقد شخصیت حقوقی مستقل است","دارای شخصیت حقوقی و استقلال مالی است","وابسته به وزارت دادگستری است","زیرمجموعه سازمان ثبت است"],
+    answer: 1,
+    exp: "کانون دارای شخصیت حقوقی و استقلال مالی است."
+  },
+  {
+    q: "هیئت‌مدیره اصلی کانون سردفتران و دفتریاران از چند نفر تشکیل می‌شود؟",
+    opts: ["۵ نفر","۷ نفر","۹ نفر","۱۱ نفر"],
+    answer: 1,
+    exp: "هیئت‌مدیره اصلی از ۷ نفر تشکیل می‌شود: ۵ سردفتر و ۲ دفتریار."
+  },
+  {
+    q: "ترکیب اعضای اصلی هیئت‌مدیره کانون چگونه است؟",
+    opts: ["۷ سردفتر و ۳ دفتریار","۵ سردفتر و ۲ دفتریار","۴ سردفتر و ۳ دفتریار","۶ سردفتر و ۱ دفتریار"],
+    answer: 1,
+    exp: "اعضای اصلی هیئت‌مدیره شامل ۵ سردفتر و ۲ دفتریار (جمعاً ۷ نفر) است."
+  },
+  {
+    q: "اعضای علی‌البدل هیئت‌مدیره کانون چند نفرند و ترکیب آن‌ها چیست؟",
+    opts: ["۲ نفر: ۱ سردفتر و ۱ دفتریار","۳ نفر: ۲ سردفتر و ۱ دفتریار","۴ نفر: ۳ سردفتر و ۱ دفتریار","۵ نفر: ۴ سردفتر و ۱ دفتریار"],
+    answer: 1,
+    exp: "اعضای علی‌البدل ۳ نفرند: ۲ سردفتر و ۱ دفتریار."
+  },
+  {
+    q: "حداقل سابقه لازم برای عضویت در هیئت‌مدیره کانون چند سال است؟",
+    opts: ["۵ سال","۷ سال","۱۰ سال","۱۵ سال"],
+    answer: 2,
+    exp: "حداقل ۱۰ سال سابقه مربوط، خدمات قضایی یا وکالت دادگستری برای عضویت در هیئت‌مدیره لازم است."
+  },
+  {
+    q: "شرط انتظامی برای عضویت در هیئت‌مدیره کانون چیست؟",
+    opts: ["نداشتن هیچ مجازات انتظامی","نداشتن مجازات انتظامی درجه ۳ به بالا طی ۵ سال اخیر","نداشتن مجازات انتظامی درجه ۲ به بالا طی ۳ سال اخیر","نداشتن مجازات انتظامی درجه ۴ به بالا طی ۱۰ سال اخیر"],
+    answer: 1,
+    exp: "شرط انتظامی، نداشتن مجازات انتظامی درجه ۳ به بالا طی ۵ سال اخیر است."
+  },
+  {
+    q: "دوره تصدی هیئت‌مدیره کانون چند سال است؟",
+    opts: ["۲ سال","۳ سال","۴ سال","۵ سال"],
+    answer: 1,
+    exp: "دوره تصدی هیئت‌مدیره کانون ۳ سال است و انتخاب مجدد برای دوره بعدی بلامانع است."
+  },
+  {
+    q: "سمت‌های هیئت‌مدیره کانون توسط چه کسانی و با چه روشی تعیین می‌شود؟",
+    opts: ["توسط رئیس قوه قضاییه با حکم","توسط سردفتران عضو با رأی مخفی","توسط کل اعضا با رأی علنی","توسط سازمان ثبت با انتصاب"],
+    answer: 1,
+    exp: "سردفتران عضو هیئت‌مدیره با رأی مخفی، سمت‌های رئیس، نائب‌رئیس، خزانه‌دار و دبیر را تعیین می‌کنند."
+  },
+  {
+    q: "امور مالی کانون با امضای چه کسانی معتبر است؟",
+    opts: ["فقط رئیس","فقط خزانه‌دار","رئیس و خزانه‌دار هر دو","رئیس و دبیر هر دو"],
+    answer: 2,
+    exp: "امور مالی کانون نیازمند امضای رئیس و خزانه‌دار هر دو است."
+  },
+  {
+    q: "ایجاد وحدت رویه توسط کانون مشروط به تأیید کدام نهاد است؟",
+    opts: ["قوه قضاییه","وزارت دادگستری","سازمان ثبت","دیوان عالی کشور"],
+    answer: 2,
+    exp: "ایجاد وحدت رویه توسط کانون مشروط به تأیید سازمان ثبت است."
+  },
+  {
+    q: "سهم دفتریار اول از درآمد دفترخانه چند درصد است؟",
+    opts: ["۱۰٪","۱۵٪","۲۰٪","۲۵٪"],
+    answer: 1,
+    exp: "سهم دفتریار اول از درآمد ناخالص دفترخانه ۱۵٪ است."
+  },
+  {
+    q: "سهم کانون از درآمد دفترخانه چند درصد است؟",
+    opts: ["۵٪","۱۰٪","۱۵٪","۲۰٪"],
+    answer: 1,
+    exp: "سهم کانون از درآمد ناخالص دفترخانه ۱۰٪ است."
+  },
+  {
+    q: "مجموع کسر از درآمد ناخالص دفترخانه (سهم دفتریار اول و کانون) چند درصد است؟",
+    opts: ["۱۵٪","۲۰٪","۲۵٪","۳۰٪"],
+    answer: 2,
+    exp: "مجموع کسر از درآمد ناخالص دفترخانه ۲۵٪ است: ۱۵٪ سهم دفتریار اول و ۱۰٪ سهم کانون."
+  }
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+function toFarsiNum(n) {
+  return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('counter').textContent = `سؤال ${toFarsiNum(current + 1)} از ${toFarsiNum(questions.length)}`;
+  document.getElementById('progress').style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const answered = answers[current] !== null;
+  let html = `<div class="question-card"><div class="question-text">${toFarsiNum(current + 1)}. ${q.q}</div><div class="options">`;
+
+  q.opts.forEach((opt, i) => {
+    let cls = '';
+    if (answered) {
+      if (i === q.answer) cls = 'correct';
+      else if (i === answers[current]) cls = 'wrong';
+    }
+    html += `<label class="${cls}"><input type="radio" name="opt" ${answered ? 'disabled' : ''} ${answers[current] === i ? 'checked' : ''} onchange="selectAnswer(${i})"> ${opt}</label>`;
+  });
+
+  html += '</div>';
+  if (answered) html += `<div class="explanation">💡 ${q.exp}</div>`;
+  html += '</div>';
+
+  document.getElementById('question-container').innerHTML = html;
+  document.getElementById('btn-prev').disabled = current === 0;
+  document.getElementById('btn-next').textContent = current === questions.length - 1 ? 'مشاهده نتیجه' : 'بعدی';
+}
+
+function selectAnswer(idx) {
+  answers[current] = idx;
+  renderQuestion();
+}
+
+function navigate(dir) {
+  if (dir === 1 && current === questions.length - 1) { showResult(); return; }
+  current = Math.max(0, Math.min(questions.length - 1, current + dir));
+  renderQuestion();
+}
+
+function showResult() {
+  let correct = 0, wrong = 0, skip = 0;
+  answers.forEach((a, i) => {
+    if (a === null) skip++;
+    else if (a === questions[i].answer) correct++;
+    else wrong++;
+  });
+  const score = Math.max(0, correct - wrong * 0.33).toFixed(2);
+  const pct = ((score / questions.length) * 100).toFixed(1);
+
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('result-area').style.display = 'block';
+  document.getElementById('result-area').innerHTML = `
+    <div class="result-card">
+      <h2>نتیجه آزمون جلسه ششم</h2>
+      <div class="result-score">${toFarsiNum(score)} از ${toFarsiNum(questions.length)}</div>
+      <div style="color:#888;margin-bottom:12px">درصد: ${toFarsiNum(pct)}٪</div>
+      <div class="result-stats">
+        <div class="stat-item stat-correct">✅ صحیح<br><strong>${toFarsiNum(correct)}</strong></div>
+        <div class="stat-item stat-wrong">❌ غلط<br><strong>${toFarsiNum(wrong)}</strong></div>
+        <div class="stat-item stat-skip">⬜ نزده<br><strong>${toFarsiNum(skip)}</strong></div>
+      </div>
+      <button class="btn btn-primary" onclick="restartQuiz()">تلاش مجدد</button>
+      <br><br>
+      <a href="jalase-6-point.html" class="back-link">📖 مطالعه نکات جلسه ششم</a>
+      <br>
+      <a href="index.html" class="back-link">→ بازگشت به فهرست جلسات</a>
+    </div>`;
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('result-area').style.display = 'none';
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
