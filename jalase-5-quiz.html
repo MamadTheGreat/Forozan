@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آزمون جلسه پنجم - مقررات ثبتی</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: Tahoma, Vazirmatn, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 20px;
+  }
+  .back-link {
+    display: inline-block;
+    margin-bottom: 15px;
+    color: #2c5282;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .quiz-container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+  .question-counter {
+    text-align: center;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 10px;
+  }
+  .progress-bar {
+    background: #e2e8f0;
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-fill {
+    background: linear-gradient(90deg,#4299e1,#2b6cb0);
+    height: 100%;
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .question-card {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .question-text {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #1a202c;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .options button {
+    padding: 12px 15px;
+    border: 2px solid #cbd5e0;
+    border-radius: 10px;
+    background: #fff;
+    text-align: right;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all .2s;
+  }
+  .options button:hover:not(:disabled) {
+    border-color: #4299e1;
+    background: #ebf8ff;
+  }
+  .options button:disabled {
+    cursor: not-allowed;
+  }
+  .options button.correct {
+    background: #c6f6d5;
+    border-color: #38a169;
+    color: #22543d;
+    font-weight: bold;
+  }
+  .options button.wrong {
+    background: #fed7d7;
+    border-color: #e53e3e;
+    color: #822727;
+    font-weight: bold;
+  }
+  .explanation {
+    margin-top: 15px;
+    padding: 12px;
+    background: #fffaf0;
+    border-right: 4px solid #dd6b20;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #744210;
+  }
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  .btn {
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .btn-primary {
+    background: #2b6cb0;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background: #a0aec0;
+    cursor: not-allowed;
+  }
+  .btn-secondary {
+    background: #edf2f7;
+    color: #2d3748;
+  }
+  .btn-secondary:disabled {
+    background: #f7fafc;
+    color: #cbd5e0;
+    cursor: not-allowed;
+  }
+  .result-card {
+    text-align: center;
+    padding: 30px 15px;
+  }
+  .result-score {
+    font-size: 42px;
+    font-weight: bold;
+    color: #2b6cb0;
+    margin-bottom: 10px;
+  }
+  .result-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .stat-correct { color: #2f855a; font-weight: bold; }
+  .stat-wrong { color: #c53030; font-weight: bold; }
+  .stat-skip { color: #718096; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">→ بازگشت به فهرست جلسات</a>
+
+<div class="quiz-container">
+
+  <div id="quiz-area">
+    <div class="question-counter" id="counter"></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div id="question-container"></div>
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" id="prevBtn" onclick="navigate(-1)">قبلی</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="navigate(1)">بعدی</button>
+    </div>
+  </div>
+
+  <div id="result-area" style="display:none">
+    <div class="result-card">
+      <div>نتیجه آزمون جلسه پنجم</div>
+      <div class="result-score" id="scoreText"></div>
+      <div class="result-stats">
+        <div class="stat-correct" id="correctStat"></div>
+        <div class="stat-wrong" id="wrongStat"></div>
+        <div class="stat-skip" id="skipStat"></div>
+      </div>
+      <div id="percentText" style="margin-bottom:20px;font-size:16px;color:#4a5568;"></div>
+      <div class="nav-buttons" style="justify-content:center;gap:15px;">
+        <button class="btn btn-secondary" onclick="restartQuiz()">تلاش دوباره</button>
+        <a href="jalase-5-point.html" class="btn btn-primary" style="text-decoration:none;display:inline-block;">مطالعه نکات جلسه</a>
+        <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-block;">بازگشت به فهرست</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  { q: "در آزمون سردفتری، در میان دو شاخه اصلی حقوق ثبت، معمولاً کدام بخش بیشتر در قالب «مقررات ثبتی» مورد سؤال قرار می‌گیرد؟",
+    opts: ["ثبت اسناد","ثبت املاک","افراز و تفکیک","تحدید حدود"], answer: 0,
+    exp: "استاد تصریح کرد که هرچند حقوق ثبت شامل ثبت املاک و ثبت اسناد است، اما در آزمون سردفتری، محور غالب در مقررات ثبتی ثبت اسناد است." },
+
+  { q: "تعریف صحیح «سند» در این جلسه کدام است؟",
+    opts: ["هر نوشته‌ای که دارای امضا باشد","نوشته‌ای که در مقام دعوا یا دفاع قابلیت استناد داشته باشد","هر نوشته‌ای که در اداره ثبت تنظیم شده باشد","نوشته‌ای که فقط در دادگاه قابل ارائه باشد"], answer: 1,
+    exp: "وجود امضا به تنهایی تعریف سند نیست. معیار اصلی، قابلیت استناد در مقام دعوا یا دفاع است." },
+
+  { q: "بر اساس ماده ۱۲۸۷ قانون مدنی، کدام گزینه درباره «سند رسمی» دقیق‌تر است؟",
+    opts: ["فقط اسنادی که در اداره ثبت تنظیم می‌شوند، رسمی‌اند","فقط اسنادی که نزد دفاتر اسناد رسمی تنظیم می‌شوند، رسمی‌اند","اسناد تنظیمی نزد مأمور رسمی، ادارات ثبت و دفاتر اسناد رسمی می‌توانند رسمی باشند","هر سندی که به ثبت برسد، بدون قید دیگر رسمی است"], answer: 2,
+    exp: "تله رایج این است که دانشجو میان سند رسمی به مفهوم مدنی و سند لازم‌الاجرا از منظر حقوق ثبت خلط کند." },
+
+  { q: "اگر در آزمون پرسیده شود: «از منظر حقوق ثبت، سند رسمی لازم‌الاجرا کدام است؟» بهترین پاسخ چیست؟",
+    opts: ["هر سندی که نزد مأمور رسمی تنظیم شده باشد","هر سندی که در اداره ثبت تنظیم شده باشد","هر سندی که در دادگاه قابلیت استناد داشته باشد","نوشته‌ای که در دفاتر اسناد رسمی تنظیم و به ثبت رسیده باشد"], answer: 3,
+    exp: "این از مهم‌ترین نکات جلسه است: هر سند رسمی، لزوماً سند رسمی لازم‌الاجرا از منظر حقوق ثبت نیست." },
+
+  { q: "کدام‌یک از گزینه‌های زیر صحیح است؟",
+    opts: ["سند تنظیم‌شده نزد مأمور رسمی ممکن است رسمی باشد، ولی لزوماً لازم‌الاجرا نیست","هر سند تنظیم‌شده نزد مأمور رسمی الزاماً لازم‌الاجراست","هر سند رسمی فقط در اداره ثبت قابلیت اجرا دارد","سند لازم‌الاجرا فقط با حکم دادگاه محقق می‌شود"], answer: 0,
+    exp: "در تست‌ها، واژه‌های «ممکن است رسمی باشد» و «لزوماً لازم‌الاجرا نیست» بسیار تعیین‌کننده‌اند." },
+
+  { q: "کدام گزینه درباره اسناد تنظیم‌شده در اداره ثبت، از منظر این جلسه، درست‌تر است؟",
+    opts: ["اصولاً سند عادی‌اند","ممکن است رسمی باشند، اما لزوماً لازم‌الاجرا نیستند","همیشه از اسناد دفترخانه‌ای معتبرترند","فقط در صورت امضای دو شاهد اعتبار دارند"], answer: 1,
+    exp: "این سؤال برای تفکیک دقیق بین رسمی بودن و لازم‌الاجرا بودن طراحی شده است." },
+
+  { q: "اگر گزینه‌ای در آزمون بگوید: «هر سند رسمی، سند لازم‌الاجرا از منظر حقوق ثبت است»، این گزاره:",
+    opts: ["صحیح است، زیرا وصف رسمی بودن کافی است","فقط درباره اسناد مأمورین رسمی درست است","فقط درباره اسناد اداره ثبت درست است","نادرست است، زیرا لازم‌الاجرا بودن در این بحث ناظر به اسناد تنظیمی و ثبت‌شده در دفاتر اسناد رسمی است"], answer: 3,
+    exp: "این دقیقاً همان دام مفهومی جلسه است. آزمون‌ساز معمولاً با اطلاق‌های کلی، داوطلب را به اشتباه می‌اندازد." },
+
+  { q: "در مواد ۴۹ تا ۶۹ قانون ثبت اسناد و املاک مصوب ۱۳۱۰، عمدتاً به چه موضوعی اشاره شده است؟",
+    opts: ["مسئولین دفتر","ثبت شرکت‌ها","نحوه افراز املاک مشاع","صلاحیت شوراهای حل اختلاف"], answer: 0,
+    exp: "این سؤال از دسته سؤالات «شماره مواد + موضوع» است که در آزمون‌های حقوقی بسیار پرتکرار است." },
+
+  { q: "اصطلاح «مباشر ثبت» در سیر تحول تاریخی مقررات ثبتی به کدام دوره مربوط است؟",
+    opts: ["قانون دفاتر اسناد رسمی ۱۳۵۴","آیین‌نامه ۱۴۰۰","قانون سال ۱۲۹۰","قانون تسهیل"], answer: 2,
+    exp: "دانستن سیر تحول اصطلاحات مثل مباشر ثبت، مسئول دفتر، صاحب دفتر، سردفتر کمک می‌کند در مواجهه با متون قدیمی دچار اشتباه نشوید." },
+
+  { q: "کدام تطبیق تاریخی صحیح‌تر است؟",
+    opts: ["«صاحب دفتر» اصطلاح نهایی و فعلی قانون است","«مسئول دفتر» فقط به دفتریار دوم اطلاق می‌شود","«مباشر ثبت» در قانون ۱۳۵۴ جایگزین سردفتر شد","در ساختار امروزی، بسیاری از تعابیر قدیمی مانند مسئول دفتر و صاحب دفتر، ناظر به جایگاهی هستند که امروز عمدتاً در قالب سردفتر شناخته می‌شود"], answer: 3,
+    exp: "در تست‌های مفهومی، طراح ممکن است از الفاظ قدیمی استفاده کند تا ببیند شما تحول اصطلاحات را فهمیده‌اید یا نه." },
+
+  { q: "سردفتر اسناد رسمی از حیث «مرجع پیشنهاد» به چه نحو منصوب می‌شود؟",
+    opts: ["به پیشنهاد سازمان ثبت اسناد و املاک کشور","به پیشنهاد رئیس قوه قضاییه","به پیشنهاد کانون سردفتران","به پیشنهاد دادستان مرکز استان"], answer: 0,
+    exp: "میان پیشنهاددهنده و صادرکننده ابلاغ تفاوت بگذارید؛ این دو در سوالات عمداً با هم خلط می‌شوند." },
+
+  { q: "کدام گزینه ترتیب صحیح مراحل انتصاب سردفتر را نشان می‌دهد؟",
+    opts: ["نظر مشورتی کانون، پیشنهاد سازمان ثبت، ابلاغ رئیس قوه قضاییه","پیشنهاد سازمان ثبت، جلب نظر مشورتی کانون، ابلاغ رئیس قوه قضاییه","ابلاغ رئیس قوه قضاییه، پیشنهاد کانون، تأیید سازمان ثبت","پیشنهاد سردفتر، ابلاغ سازمان ثبت، تأیید کانون"], answer: 1,
+    exp: "ترتیب صحیح را دقیق حفظ کنید: پیشنهاد سازمان ثبت ← نظر مشورتی کانون ← ابلاغ رئیس قوه قضاییه" },
+
+  { q: "اگر در متن ابلاغ، عنوان «معاون رئیس قوه قضاییه، رئیس سازمان ثبت» آمده باشد، از نظر حقوقی ابلاغ سردفتری همچنان از طرف چه مرجعی محسوب می‌شود؟",
+    opts: ["کانون سردفتران","سازمان ثبت","رئیس قوه قضاییه","وزیر دادگستری"], answer: 2,
+    exp: "استاد تأکید کرد که هرچند این اختیار تفویض شده، اما از نظر حقوقی همچنان گفته می‌شود ابلاغ از طرف رئیس قوه قضاییه است." },
+
+  { q: "تعریف صحیح دفتریار در این جلسه کدام است؟",
+    opts: ["شخصی که به پیشنهاد سازمان ثبت و ابلاغ کانون منصوب می‌شود","شخصی که به پیشنهاد سردفتر و با ابلاغ سازمان ثبت اسناد و املاک کشور منصوب می‌شود","شخصی که فقط با حکم رئیس قوه قضاییه منصوب می‌شود","شخصی که توسط اداره ثبت محل انتخاب و توسط دادستان ابلاغ می‌شود"], answer: 1,
+    exp: "اگر تفاوت تشریفات انتصاب سردفتر و دفتریار را خوب یاد بگیرید، چند سؤال آزمون را به‌راحتی پاسخ می‌دهید." },
+
+  { q: "مهم‌ترین تفاوت تشریفاتی انتصاب دفتریار نسبت به سردفتر کدام است؟",
+    opts: ["دفتریار با نظر مشورتی کانون منصوب می‌شود","دفتریار به پیشنهاد سردفتر و با ابلاغ سازمان ثبت منصوب می‌شود","دفتریار با ابلاغ رئیس قوه قضاییه منصوب می‌شود","دفتریار نیاز به هیچ‌گونه ابلاغی ندارد"], answer: 1,
+    exp: "در این سؤال، طراح می‌خواهد ببیند شما دچار سرایت دادن قواعد سردفتر به دفتریار می‌شوید یا نه." },
+
+  { q: "جایگاه دفتریار اول در دفترخانه کدام است؟",
+    opts: ["فقط کارمند اداری دفترخانه است","صرفاً نماینده کانون سردفتران است","معاون سردفتر و نماینده سازمان ثبت در دفترخانه است","قائم‌مقام رئیس ثبت محل است"], answer: 2,
+    exp: "دو وصف کلیدی دفتریار اول را باید با هم حفظ کرد: معاون سردفتر + نماینده سازمان ثبت" },
+
+  { q: "تفاوت مالی دفتریار اول و دفتریار دوم، مطابق این جلسه، کدام است؟",
+    opts: ["دفتریار اول ۱۵٪ حق‌التحریر می‌گیرد و دفتریار دوم حقوق خود را طبق قانون کار از سردفتر دریافت می‌کند","هر دو ۱۵٪ حق‌التحریر دارند","فقط دفتریار دوم سهم از حق‌التحریر دارد","هر دو صرفاً حقوق ثابت از سازمان ثبت می‌گیرند"], answer: 0,
+    exp: "طراح ممکن است این تفاوت را با بحث مرجع انتصاب مخلوط کند. اینجا سؤال فقط درباره وضعیت مالی است." },
+
+  { q: "منبع اصلی این بخش از مقررات ثبتی، طبق بیان استاد، کدام است؟",
+    opts: ["صرفاً قانون ثبت اسناد و املاک ۱۳۱۰","قانون دفاتر اسناد رسمی مصوب ۱۳۵۴","آیین‌نامه ۱۳۱۷","فقط قانون مدنی"], answer: 1,
+    exp: "قانون پایه این بخش قانون دفاتر اسناد رسمی ۱۳۵۴ است؛ در کنار آن، آیین‌نامه فعلی نیز باید خوانده شود." },
+
+  { q: "درباره آیین‌نامه قانون دفاتر اسناد رسمیِ معتبر فعلی، کدام گزینه صحیح است؟",
+    opts: ["در ۲۸/۱۲/۱۳۹۹ تصویب و از ۱۰/۱/۱۴۰۰ لازم‌الاجرا شده است","در ۱۳۱۷ تصویب شده و همچنان مبنای اصلی مطالعه است","هم‌زمان با قانون ۱۳۵۴ تصویب و اجرا شد","هنوز آیین‌نامه معتبری برای قانون ۱۳۵۴ وجود ندارد"], answer: 0,
+    exp: "تاریخ تصویب و شروع اجرا را از هم تفکیک کنید؛ هر دو ممکن است جداگانه موضوع سؤال قرار گیرند." },
+
+  { q: "اگر داوطلبی بگوید «برای آزمون فعلی، آیین‌نامه ۱۳۱۷ را باید به‌عنوان مبنای معتبر بخوانیم»، این گفته طبق این جلسه:",
+    opts: ["کاملاً درست است","فقط در بخش اسناد لازم‌الاجرا درست است","فقط برای مباحث ساختمانی درست است","نادرست است؛ مبنای فعلی مطالعه، آیین‌نامه مصوب ۲۸/۱۲/۱۳۹۹ و لازم‌الاجرا از ۱۰/۱/۱۴۰۰ است"], answer: 3,
+    exp: "استاد با تأکید گفت که آیین‌نامه ۱۳۱۷ را باید کنار گذاشت و مبنای معتبر فعلی همان آیین‌نامه ۱۴۰۰ است." },
+
+  { q: "مطابق ماده ۴ آیین‌نامه ۱۴۰۰، سردفتر پس از ابلاغ پیام الکترونیکی حکم انتصاب، حداکثر چه مدت برای تأسیس دفترخانه و شروع به کار فرصت دارد؟",
+    opts: ["سه ماه","شش ماه","یک ماه","دو ماه"], answer: 0,
+    exp: "هم مهلت و هم مبدأ مهلت مهم‌اند. بسیاری فقط عدد سه ماه را حفظ می‌کنند و مبدأ را فراموش می‌کنند." },
+
+  { q: "مبدأ احتساب مهلت تأسیس دفترخانه چیست؟",
+    opts: ["تاریخ قبولی در اختبار","ابلاغ پیام الکترونیکی حکم انتصاب سردفتری","تاریخ اجاره محل دفترخانه","تاریخ معرفی به کانون سردفتران"], answer: 1,
+    exp: "این سؤال برای جلوگیری از اشتباه رایج طراحی شده است؛ مبدأ از زمان ابلاغ الکترونیکی حکم است، نه از زمان اطلاع شفاهی یا فراهم‌کردن محل." },
+
+  { q: "اگر سردفتر در مهلت مقرر، دفترخانه را تأسیس و شروع به کار نکند، ضمانت اجرای قانونی چیست؟",
+    opts: ["صرفاً اخطار کتبی دریافت می‌کند","به پرداخت جریمه نقدی محکوم می‌شود","حکم انتصاب او کان‌لم‌یَکن می‌شود","مهلت او خودبه‌خود تمدید می‌شود"], answer: 2,
+    exp: "«کان‌لم‌یَکن شدن حکم» از تعبیرهای بسیار مهم و آزمونی این جلسه است و نباید با تعلیق یا توبیخ اشتباه گرفته شود." },
+
+  { q: "اگر سردفتری بخواهد در همان شهر، فقط از یک پلاک به پلاک مجاور منتقل شود، این اقدام تابع کدام حکم است؟",
+    opts: ["نیازی به اخذ موافقت ندارد","منوط به موافقت اداره ثبت همان محل است","نیازمند موافقت رئیس قوه قضاییه است","فقط با رضایت کانون سردفتران ممکن است"], answer: 1,
+    exp: "استاد تأکید کرد که هرگونه جابه‌جایی در همان شهر، حتی بسیار جزئی، نیازمند موافقت ثبت محل است." },
+
+  { q: "مرجع موافقت با انتقال دفترخانه از یک حوزه ثبتی به شهر دیگر کدام است؟",
+    opts: ["رئیس سازمان ثبت اسناد و املاک کشور","اداره ثبت همان محل","کانون سردفتران استان مقصد","دادستان محل مقصد"], answer: 0,
+    exp: "میان این دو را قاطعانه تفکیک کنید: در همان شهر: اداره ثبت محل / از یک حوزه به حوزه دیگر: رئیس سازمان ثبت" },
+
+  { q: "در انتقال دفترخانه از شهری به شهر دیگر، علاوه بر موافقت مرجع صالح، چه امر دیگری نیز لازم است؟",
+    opts: ["صرف رضایت سردفتر کافی است","صدور حکم مقتضی","برگزاری اختبار مجدد","تأیید شورای شهر مقصد"], answer: 1,
+    exp: "این قسمت معمولاً در مرورها فراموش می‌شود؛ استاد گفت فقط موافقت کافی نیست، بلکه باید حکم مقتضی هم صادر شود." },
+
+  { q: "مفهوم صحیح «ابلاغ سیار» کدام است؟",
+    opts: ["اجازه تنظیم سند در هر نقطه‌ای که سردفتر صلاح بداند","مجوز مراجعه سردفتر به منازل بیماران به عنوان مفهوم اصلی این ابلاغ","ابلاغ موقت رئیس سازمان ثبت برای فعالیت سردفتر در محل یا شهر دیگر به منظور جبران کمبود خدمات ثبتی","انتقال دائم دفترخانه اصلی به حوزه‌ای پرمعامله"], answer: 2,
+    exp: "این سؤال عمداً سه برداشت نادرست رایج را در گزینه‌ها آورده است. ابلاغ سیار نه سیاحت اداری است، نه انتقال دائم، نه مفهوم ویژه بیماران." },
+
+  { q: "کدام‌یک از ویژگی‌های زیر درباره ابلاغ سیار نادرست است؟",
+    opts: ["ماهیت آن موقتی است","با رفع ضرورت قابل لغو است","دفترخانه اصلی سردفتر همچنان باقی می‌ماند","ابلاغ سیار موجب زوال ابلاغ اصلی و استقرار دائم در حوزه دوم می‌شود"], answer: 3,
+    exp: "در ابلاغ سیار، حوزه اصلی از بین نمی‌رود؛ سردفتر فقط به‌صورت موقت در محل دیگر هم فعالیت می‌کند." },
+
+  { q: "اگر ساختمانی فاقد آسانسور باشد، استقرار دفترخانه در کدام وضعیت با ضوابط این جلسه ناسازگارتر است؟",
+    opts: ["طبقه همکف","طبقه اول","طبقه دوم","طبقه سوم"], answer: 3,
+    exp: "قاعده‌ای که باید حفظ شود: بدون آسانسور، طبقات سوم به بالا مناسب نیستند؛ چون با شرط سهولت دسترسی برای سالمندان و افراد توان‌خواه تعارض دارد." },
+
+  { q: "تأسیس دفترخانه در مجتمع مسکونی آپارتمانی، مطابق این جلسه، در چه صورتی مجاز است؟",
+    opts: ["هرگاه متراژ واحد بیش از ۵۰ متر باشد","هرگاه اکثریت مالکین رضایت شفاهی بدهند","فقط وقتی سردفتر مالک واحد باشد و رضایت کتبی سایر مالکین و بهره‌برداران نیز اخذ شود","اگر واحد در طبقه اول یا همکف باشد، بدون شرط دیگر مجاز است"], answer: 2,
+    exp: "دو شرط باید هم‌زمان جمع شوند: مالک بودن سردفتر + رضایت کتبی سایر مالکین و بهره‌برداران. صرف یکی از این دو کافی نیست." }
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+function toFarsiNum(n) {
+  return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('counter').textContent =
+    `سؤال ${toFarsiNum(current + 1)} از ${toFarsiNum(questions.length)}`;
+  document.getElementById('progress').style.width =
+    ((current + 1) / questions.length * 100) + '%';
+
+  const selected = answers[current];
+  let optionsHtml = '';
+  q.opts.forEach((opt, idx) => {
+    let cls = '';
+    if (selected !== null) {
+      if (idx === q.answer) cls = 'correct';
+      else if (idx === selected) cls = 'wrong';
+    }
+    optionsHtml += `<button class="${cls}" onclick="selectAnswer(${idx})" ${selected !== null ? 'disabled' : ''}>
+      ${toFarsiNum(idx + 1)}) ${opt}
+    </button>`;
+  });
+
+  let explanationHtml = '';
+  if (selected !== null) {
+    explanationHtml = `<div class="explanation"><strong>نکته آزمونی:</strong><br>${q.exp}</div>`;
+  }
+
+  document.getElementById('question-container').innerHTML = `
+    <div class="question-card">
+      <div class="question-text">${toFarsiNum(current + 1)}) ${q.q}</div>
+      <div class="options">${optionsHtml}</div>
+      ${explanationHtml}
+    </div>
+  `;
+
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').textContent =
+    current === questions.length - 1 ? 'مشاهده نتیجه' : 'بعدی';
+}
+
+function selectAnswer(idx) {
+  answers[current] = idx;
+  renderQuestion();
+}
+
+function navigate(dir) {
+  if (dir === 1 && current === questions.length - 1) {
+    showResult();
+    return;
+  }
+  current = Math.max(0, Math.min(questions.length - 1, current + dir));
+  renderQuestion();
+}
+
+function showResult() {
+  let correct = 0, wrong = 0, skip = 0;
+  answers.forEach((a, i) => {
+    if (a === null) skip++;
+    else if (a === questions[i].answer) correct++;
+    else wrong++;
+  });
+
+  const score = Math.max(0, correct - wrong * 0.33).toFixed(2);
+  const pct = ((score / questions.length) * 100).toFixed(1);
+
+  document.getElementById('scoreText').textContent = `${toFarsiNum(score)} از ${toFarsiNum(questions.length)}`;
+  document.getElementById('correctStat').textContent = `صحیح: ${toFarsiNum(correct)}`;
+  document.getElementById('wrongStat').textContent = `غلط: ${toFarsiNum(wrong)}`;
+  document.getElementById('skipStat').textContent = `نزده: ${toFarsiNum(skip)}`;
+  document.getElementById('percentText').textContent = `درصد: ${toFarsiNum(pct)}٪`;
+
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('result-area').style.display = 'block';
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('result-area').style.display = 'none';
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+
+</body>
+</html>
